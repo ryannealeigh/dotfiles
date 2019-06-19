@@ -1,0 +1,389 @@
+# Color ls
+alias ls='colorls -lA --sd'
+
+function rmjunk() {
+	rm portal-impl/portal-impl.iml portal-kernel/portal-kernel.iml portal-test-integration/portal-test-integration.iml portal-test/portal-test.iml portal-web/portal-web.iml util-bridges/util-bridges.iml util-java/util-java.iml util-slf4j/util-slf4j.iml util-taglib/util-taglib.iml
+}
+
+function runbundle() {
+	tomcat*/bin/catalina.sh jpda run
+}
+
+function prepbundle() {
+	mkdir deploy
+
+	cp /home/ryan/dev/activation-key-digitalenterprisedevelopment-7.1-liferaycom.xml ./deploy
+
+	cp /home/ryan/Documents/portal-ext.properties ./
+}
+
+#
+# Backport Automator Constants
+#
+
+CURRENTUSERGITHUBNAME=ryannealeigh1
+CURRENTUSERJIRANAME=william.nealeigh
+
+DEFAULTGITHUBREVIEWER=spencerwoo
+DEFAULTJIRAREVIEWER=spencer.woo
+
+#
+# Backport Automator
+#
+
+function bpr() {
+	case "$1" in
+		-h)
+			echo -e "Continue cherry picking from hash '$3'\n"
+			cherryPickCommit $2 $3
+			;;
+		-s)
+			submitBpr $2
+			;;
+		*)
+			echo -e "Peforming automated BPR\n"
+			checkoutBackportBranch $1
+			cherryPickCommit $1
+			;;
+	esac
+}
+
+function checkoutBackportBranch() {
+	BRANCH=$(grep -F lp.version.major= release.properties | cut -d'=' -f 2 | tr -d '.')x
+
+	git checkout -b $1-$BRANCH > /dev/null 2>&1
+}
+
+function cherryPickCommit() {
+	# $1 is the LPS ticket
+	# $2 is the starting hash
+
+	IFS=$'\n'
+
+	HASHES=($(git log --reverse --pretty=%h --grep $1 master))
+
+	if [[ 0 -eq ${#HASHES[@]} ]]
+	then
+		echo "No commits match $1. Please update your master branch or confirm the commit message is correct."
+
+		return
+	fi
+
+	MESSAGES=($(git log --reverse --pretty=%s --grep $1 master))
+
+	echo "Beginning cherry pick for ${#HASHES[@]} commit(s) that match '$1'"
+	echo
+
+	if [ $2 ]
+	then
+		CHERRYPICK=false
+	else
+		CHERRYPICK=true
+	fi
+
+	for ((i = 0; i < ${#HASHES[@]}; i++))
+	do
+		if [[ $2 = ${HASHES[i]} ]]
+		then
+			CHERRYPICK=true
+		fi
+
+		if [ $CHERRYPICK = false ]
+		then
+			continue
+		fi
+
+		git cherry-pick ${HASHES[i]} > /dev/null 2>&1
+
+		if [ $? -eq 0 ]
+		then
+			echo -e "Successfully cherry picked" ${HASHES[i]} ${MESSAGES[i]}
+		else
+			echo -e "Could not perform cherry pick for" ${HASHES[i]} ${MESSAGES[i]}
+
+			if [[ $(($i + 1)) -lt ${#HASHES[@]} ]]
+			then
+				echo "Please resolve the conflict(s) and then run 'bpr -h $1 ${HASHES[i + 1]}'"
+			else
+				echo "Please resolve the conflict(s) and then run 'bpr -s $1'"
+			fi
+
+			return 0;
+		fi
+	done
+
+	IFS=' '
+
+	echo -e "\nDo you wish to test the changes? (y/n): "
+	read TEST
+
+	if [[ "$TEST" == y ]] || [[ "$TEST" == Y ]]
+	then
+		echo -e "\nWhen done testing, submit the backport by running 'bpr -s $1'"
+
+		return 0
+	fi
+
+	submitBpr $1
+}
+
+function submitBpr() {
+	# $1 is the LPS ticket
+
+	echo -e "\nSubmitting current branch for BPR\n"
+
+	BACKPORTVERION=$(grep -F lp.version.major= release.properties | cut -d'=' -f 2).x
+
+	if [[ $BACKPORTVERION == 7.1.x ]]
+	then
+		BPR=$(curl -s -n -X GET -H "Content-Type: application/json" "https://issues.liferay.com/rest/api/2/search?jql=project+%3D+BPR+AND+issue+in+linkedIssues('$1'%2C+'relates'%2C+'is+related+to')+AND+'Backport+Version'+%3D+'7.1+EE+(Fix+Pack+or+MP+Release)'&maxResults=1&fields=key" | jq -r '.issues | .[0].key')
+	elif [[ $BACKPORTVERION == 7.0.x ]]
+	then
+		BPR=$(curl -s -n -X GET -H "Content-Type: application/json" "https://issues.liferay.com/rest/api/2/search?jql=project+%3D+BPR+AND+issue+in+linkedIssues('$1'%2C+'relates'%2C+'is+related+to')+AND+'Backport+Version'+%3D+'7.0+EE+(Fix+Pack+or+MP+Release)'&maxResults=1&fields=key" | jq -r '.issues | .[0].key')
+	elif [[ $BACKPORTVERION == 6.2.x ]]
+	then
+		BACKPORTVERION=ee-6.2.x
+
+		BPR=$(curl -s -n -X GET -H "Content-Type: application/json" "https://issues.liferay.com/rest/api/2/search?jql=project+%3D+BPR+AND+issue+in+linkedIssues('$1'%2C+'relates'%2C+'is+related+to')+AND+'Backport+Version'+%3D+'6.2+EE+(fix+pack)'&maxResults=1&fields=key" | jq -r '.issues | .[0].key')
+	else
+		echo "Unknown backport version. Please either checkout 7.0.x or ee-6.2.x."
+
+		return
+	fi
+
+	if [[ $BPR == "null" ]]
+	then
+		echo No BPR ticket found. Creating new BPR ticket.
+
+		if [[ $BACKPORTVERION == 7.1.x ]]
+		then
+			BPR=$(curl -s -n -X POST --data '{"fields": {"project":{"key":"BPR"}, "summary":"71x '$1'", "issuetype":{"name":"Backport Request"}, "customfield_11531":{"value":"Support"}, "customfield_14424":{"id":"28812"}}}' -H "Content-Type: application/json" https://issues.liferay.com/rest/api/2/issue | jq -r '.key')
+		elif [[ $BACKPORTVERION == 7.0.x ]]
+		then
+			BPR=$(curl -s -n -X POST --data '{"fields": {"project":{"key":"BPR"}, "summary":"70x '$1'", "issuetype":{"name":"Backport Request"}, "customfield_11531":{"value":"Support"}, "customfield_14424":{"id":"23335"}}}' -H "Content-Type: application/json" https://issues.liferay.com/rest/api/2/issue | jq -r '.key')
+		elif [[ $BACKPORTVERION == 6.2.x ]]
+		then
+			BPR=$(curl -s -n -X POST --data '{"fields": {"project":{"key":"BPR"}, "summary":"62x '$1'", "issuetype":{"name":"Backport Request"}, "customfield_11531":{"value":"Support"}, "customfield_14424":{"id":"16327"}}}' -H "Content-Type: application/json" https://issues.liferay.com/rest/api/2/issue | jq -r '.key')
+		fi
+
+		curl -s -n -X POST --data '{"type":{"name":"Relationship"}, "inwardIssue":{"key":"'$1'"}, "outwardIssue":{"key":"'$BPR'"}}' -H "Content-Type: application/json" https://issues.liferay.com/rest/api/2/issueLink > /dev/null
+	fi
+
+	# Get the reviewer's GitHub name
+	echo -n "Enter the reviewer's GitHub name and press [ENTER] ($DEFAULTGITHUBREVIEWER): "
+	read GITHUBREVIEWER
+
+	if [[ -z $GITHUBREVIEWER ]]
+	then
+		GITHUBREVIEWER=$DEFAULTGITHUBREVIEWER
+	fi
+
+	# Get the reviewer's Jira name
+	echo -n "Enter the reviewer's Jira name and press [ENTER] ($DEFAULTJIRAREVIEWER): "
+	read JIRAREVIEWER
+
+	if [[ -z $JIRAREVIEWER ]]
+	then
+		JIRAREVIEWER=$DEFAULTJIRAREVIEWER
+	fi
+
+	# Get the current branch name
+	CURRENTBRANCH=$(git rev-parse --abbrev-ref HEAD)
+
+	git push origin $CURRENTBRANCH > /dev/null 2>&1
+
+	# Create the pull request
+	PULLREQUESTURL=$(git pull-request -m "$BPR / $1 | $BACKPORTVERION
+
+	https://issues.liferay.com/browse/$BPR
+
+https://issues.liferay.com/browse/$1" -b $GITHUBREVIEWER:$BACKPORTVERION -h $CURRENTUSERGITHUBNAME:$CURRENTBRANCH)
+
+	# Assign the BPR ticket to the current user so they have permission to push it through the workflow
+	curl -s -n -X PUT --data '{"name":"'$CURRENTUSERJIRANAME'"}' -H "Content-Type: application/json" https://issues.liferay.com/rest/api/2/issue/$BPR/assignee > /dev/null
+
+	# Progress BPR through workflow no matter what state it is in
+	curl -s -n -X POST --data '{"transition": {"id":"21"}}' -H "Content-Type: application/json" https://issues.liferay.com/rest/api/2/issue/$BPR/transitions > /dev/null
+	curl -s -n -X POST --data '{"transition": {"id":"31"}}' -H "Content-Type: application/json" https://issues.liferay.com/rest/api/2/issue/$BPR/transitions > /dev/null
+	curl -s -n -X POST --data '{"fields": {"assignee":{"name":"'$JIRAREVIEWER'"}, "customfield_10421":"'$PULLREQUESTURL'"}, "transition": {"id":"41"}}' -H "Content-Type: application/json" https://issues.liferay.com/rest/api/2/issue/$BPR/transitions > /dev/null
+
+	echo
+	echo Pull Request - $PULLREQUESTURL
+	echo BPR Ticket - https://issues.liferay.com/browse/$BPR
+}
+
+function aa() {
+        ${MCD_RD_CLONE_PATH}/nodejs/safeant all
+}
+
+function cachenpm() {
+        ${MCD_RD_CLONE_PATH}/nodejs/cachenpm
+}
+
+function hs() {
+	cd /home/ryan/Desktop/master/tomcat*/lib/ext && java -cp hsql.jar org.hsqldb.util.DatabaseManagerSwing
+}
+
+function lr() {
+	#Kill tomcat
+	kt
+
+	#copy portal-ext.properties
+	cpext
+
+	#cd to tomcat bin
+	cd /home/ryan/Desktop/master/tomcat*/bin
+
+	#start liferay
+	./catalina.sh jpda run
+}
+
+function gcp() {
+	git cherry-pick
+}
+
+function cds() {
+    if [ -n "$1" ]; then
+        local folderPath
+
+        if is_cwd_liferayDXP; then
+            pushd $(git rev-parse --show-toplevel) > /dev/null
+
+            #folderPath="$(git ls-files | grep -m 1 "$1/bnd.bnd" | head -1 | xargs -n1 dirname)"
+            #folderPath="$(git ls-files \
+            #| awk -v moduleRegex=".*$1[^/]*\/(app|bnd).bnd" -v simpleRegex=".*$1" \
+            #     '$0 ~ moduleRegex || $0 ~ simpleRegex {print; exit}' \
+            #| xargs -n1 dirname)"
+
+            #Search more strictly - match search term exactly in module name
+            folderPath="$(git ls-files \
+                | awk -v moduleRegex="/$1/((app|bnd).bnd|build(.gradle|.xml))" \
+                    '$0 ~ moduleRegex {print; exit}' \
+                | xargs -n1 dirname)"
+
+            #Search not as strictly - contains search term in module name
+            if [ -z "$folderPath" ]; then
+                folderPath="$(git ls-files \
+                    | awk -v moduleRegex="$1/((app|bnd).bnd|build(.gradle|.xml))" \
+                        '$0 ~ moduleRegex {print; exit}' \
+                    | xargs -n1 dirname)"
+            fi
+
+            if [ -n "$folderPath" ]; then
+                folderPath="$(git rev-parse --show-toplevel)/$folderPath"
+            fi
+
+            popd > /dev/null
+        fi
+
+        if [ -z "$folderPath" ]; then
+            if is_cwd_git; then
+                pushd $(git rev-parse --show-toplevel) > /dev/null
+
+                folderPath="$(git ls-files | grep -m 1 "$1/" | xargs -n1 dirname)"
+
+                if [ -n "$folderPath" ]; then
+                    folderPath="$(git rev-parse --show-toplevel)/$folderPath"
+                fi
+
+                popd > /dev/null
+            fi
+
+            if [ -z "$folderPath" ]; then
+                folderPath="$(find . -type d -name "*$1*" -print0 -quit)"
+            fi
+        fi
+
+        if [ -n "$folderPath" ]; then
+            cd -- $folderPath
+        fi
+    fi
+}
+
+function db() {
+	yes | mysqladmin -uroot --password='***REMOVED***' drop lportal
+	mysqladmin -uroot --password='***REMOVED***' create lportal --default-character-set=utf8
+}
+
+#init master bundle
+function ibm() {
+	#kill any running tomcat processes
+	kt
+
+	#wipe and init new lportal database
+	db	
+	
+	#clear out bundle folder
+	rm -r /home/ryan/Desktop/master/*
+
+	#copy portal-ext.properties
+	cpext
+
+	#cd to Downloads
+	cd /home/ryan/Downloads/
+
+	#unpack master bundle
+	tar -xf master* -C /home/ryan/Desktop/master
+}
+
+function kt() {
+	pkill -9 -f catalina
+}
+
+function cpext() {
+	if [ ! -f /home/ryan/Desktop/master/portal-ext.properties ]; then
+    	cp /home/ryan/Documents/portal-ext.properties /home/ryan/Desktop/master
+    fi
+}
+
+function cpr() {
+	cp /home/ryan/Documents/ROOT.xml /home/ryan/Desktop/master/tomcat-9.0.10/conf/Catalina/localhost
+}
+
+function gs() {
+        git status
+}
+
+MCD_RD_CLONE_PATH=/home/ryan/liferay_dev/liferay-faster-deploy
+
+function gw() {
+        ${MCD_RD_CLONE_PATH}/gw $@
+}
+
+IJ_CLONE_PATH=/home/ryan/liferay_dev/liferay-intellij
+
+function ij() {
+    ${IJ_CLONE_PATH}/intellij "$@"
+    echo building ij
+}
+
+# docker template for Apache (Proxy Pass)
+# host: localhost
+# port: 443 (configured via -p 443:443)
+# reverse proxy:
+#    ProxyPass properties in ./conf/extra/httpd-vhosts.conf:
+#        ProxyPass /liferay ajp://172.17.0.1:8009
+#        ProxyPassReverse /liferay ajp://172.17.0.1:8009
+#
+#        (by default, 172.17.0.1 should route to your localhost:8009)
+#    For Liferay, add the following portal properties (modify accordingly):
+#        web.server.https.port=443
+#        web.server.protocol=https
+#        portal.proxy.path=/liferay
+# configuration files:
+#     ./conf/httpd.conf
+#     ./conf/extra/httpd-vhosts.conf
+#     ./conf/extra/httpd-ssl.conf
+# SSL (dummy certificate that was generated and set to expire in 365000 days):
+#    ./conf/dummy-server.crt
+#    ./conf/dummy-server.key
+#
+# Config file: /home/ryan/liferay_dev/liferay-dev-tools/docker/templates/webservers/apache-proxypass/dockerapache_proxypass
+#
+function dockerapache_proxypass() {
+        /home/ryan/liferay_dev/liferay-dev-tools/docker/templates/webservers/apache-proxypass/dockerapache_proxypass "$@"
+}
+
+function cds() {
+        . ${MCD_RD_CLONE_PATH}/notmine/cds
+}

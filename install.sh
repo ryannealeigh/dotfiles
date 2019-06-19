@@ -1,0 +1,1 @@
+ln -s $ZSH_CONFIG/.zshrc $HOME
