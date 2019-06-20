@@ -2,6 +2,9 @@
 export ZSH="$HOME/dotfiles/.oh-my-zsh"
 export ZSH_CONFIG="$HOME/dotfiles/.zsh"
 
+# ignore rm prompt
+setopt rm_star_silent
+
 # Set name of the theme to load --- if set to "random", it will
 # load a random theme each time oh-my-zsh is loaded, in which case,
 # to know which specific one was loaded, run: echo $RANDOM_THEME
