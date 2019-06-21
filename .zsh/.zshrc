@@ -5,6 +5,12 @@ export ZSH_CONFIG="$HOME/dotfiles/.zsh"
 # ignore rm prompt
 setopt rm_star_silent
 
+# Add JDK to path
+export JAVA_HOME=/home/ryan/dev/java/jdk1.8.0_192
+
+# Set ANT_OPTS
+export ANT_OPTS=-Xmx4g
+
 # Set name of the theme to load --- if set to "random", it will
 # load a random theme each time oh-my-zsh is loaded, in which case,
 # to know which specific one was loaded, run: echo $RANDOM_THEME
@@ -28,3 +34,4 @@ source $ZSH/oh-my-zsh.sh
 
 # aliases
 source $ZSH_CONFIG/.zsh_aliases
+
