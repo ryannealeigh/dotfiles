@@ -6,6 +6,7 @@ function rmjunk() {
 }
 
 function runbundle() {
+	cleanbundle
 	tomcat*/bin/catalina.sh jpda run
 }
 
@@ -386,4 +387,11 @@ function dockerapache_proxypass() {
 
 function cds() {
         . ${MCD_RD_CLONE_PATH}/notmine/cds
+}
+
+function cleanbundle() {
+	rm -rf tomcat*/work
+	rm -rf tomcat*/temp
+	rm -rf osgi/state
+	rm -rf work
 }
