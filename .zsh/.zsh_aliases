@@ -1,5 +1,5 @@
 # Color ls
-alias ls='colorls -lA --sd'
+alias ls='colorls -a --sd'
 
 function rmjunk() {
 	rm portal-impl/portal-impl.iml portal-kernel/portal-kernel.iml portal-test-integration/portal-test-integration.iml portal-test/portal-test.iml portal-web/portal-web.iml util-bridges/util-bridges.iml util-java/util-java.iml util-slf4j/util-slf4j.iml util-taglib/util-taglib.iml
