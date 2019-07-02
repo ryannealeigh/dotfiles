@@ -3,7 +3,13 @@
 
 echo "Installing symlinks."
 
-ln -s $ZSH_CONFIG/.zshrc $HOME
+# Link .zshrc
+ln -s $HOME/dotfiles/.zsh/.zshrc $HOME
+
+# Link .gitconfig
+ln -s $HOME/dotfiles/git/.gitconfig $HOME
+
+# Link spaceship-prompt theme
 ln -s $HOME/dotfiles/theme/spaceship-prompt/spaceship.zsh-theme $HOME/dotfiles/.oh-my-zsh/custom/themes
 
 echo "Installation complete."
