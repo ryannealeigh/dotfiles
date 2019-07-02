@@ -12,4 +12,7 @@ ln -s $HOME/dotfiles/git/.gitconfig $HOME
 # Link spaceship-prompt theme
 ln -s $HOME/dotfiles/theme/spaceship-prompt/spaceship.zsh-theme $HOME/dotfiles/.oh-my-zsh/custom/themes
 
+# Link vim config
+ln -s $HOME/dotfiles/.vim/.vimrc $HOME
+
 echo "Installation complete."
