@@ -229,9 +229,6 @@ function lr() {
 	#Kill tomcat
 	kt
 
-	#copy portal-ext.properties
-	cpext
-
 	#cd to tomcat bin
 	cd /home/ryan/Desktop/master/tomcat*/bin
 
