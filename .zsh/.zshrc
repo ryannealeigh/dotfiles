@@ -5,6 +5,9 @@ export ZSH_CONFIG="$HOME/dotfiles/.zsh"
 # ignore rm prompt
 setopt rm_star_silent
 
+# matching like bash
+setopt nomatch
+
 # Add JDK to path
 export JAVA_HOME=/home/ryan/dev/java/jdk1.8.0_192
 
@@ -35,3 +38,5 @@ source $ZSH/oh-my-zsh.sh
 # aliases
 source $ZSH_CONFIG/.zsh_aliases
 
+# Liferay testing vars
+export CATALINA_OPTS="$CATALINA_OPTS -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.port=8099 -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.authenticate=false"
