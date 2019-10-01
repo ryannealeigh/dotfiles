@@ -1,0 +1,6 @@
+let g:netrw_dirhistmax  =10
+let g:netrw_dirhist_cnt =4
+let g:netrw_dirhist_1='/Users/ryan/dotfiles'
+let g:netrw_dirhist_2='/Users/ryan/dotfiles/.oh-my-zsh'
+let g:netrw_dirhist_3='/Users/ryan/dotfiles/.oh-my-zsh/custom'
+let g:netrw_dirhist_4='/Users/ryan/dotfiles/.oh-my-zsh/custom/themes'

@@ -8,9 +8,6 @@ setopt rm_star_silent
 # matching like bash
 setopt nomatch
 
-# Add JDK to path
-export JAVA_HOME=/home/ryan/dev/java/jdk1.8.0_192
-
 # Set ANT_OPTS
 export ANT_OPTS=-Xmx4g
 
@@ -39,4 +36,17 @@ source $ZSH/oh-my-zsh.sh
 source $ZSH_CONFIG/.zsh_aliases
 
 # Liferay testing vars
-export CATALINA_OPTS="$CATALINA_OPTS -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.port=8099 -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.authenticate=false"
+export CATALINA_OPTS="$CATALINA_OPTS -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.port=8099 -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.authenticate=false"export PATH="$HOME/.jenv/bin:$PATH"
+
+# jenv
+eval "$(jenv init -)"
+export PATH="$PATH:$HOME/Library/PackageManager/bin"
+
+# Adding autocomplete for 'we'
+[ -f ~/.lcp_autocomplete ] && source ~/.lcp_autocomplete
+
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"  # This loads nvm
+[ -s "$NVM_DIR/bash_completion" ] && . "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+
+export PATH="$HOME/.composer/vendor/bin:$PATH"
