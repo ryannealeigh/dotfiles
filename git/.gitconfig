@@ -1,5 +1,15 @@
 [user]
 	name = Ryan Nealeigh
-	email = ryan.nealeigh@gmail.com
+	email = ryan.nealeigh@liferay.cloud
 [core]
 	editor = nano
+	pager = less
+[pager]
+	status = false
+[filter "lfs"]
+	clean = git-lfs clean -- %f
+	smudge = git-lfs smudge -- %f
+	process = git-lfs filter-process
+	required = true
+[merge]
+	renamelimit = 20208

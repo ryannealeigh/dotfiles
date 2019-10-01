@@ -13,9 +13,9 @@ function runbundle() {
 function prepbundle() {
 	mkdir deploy
 
-	cp /home/ryan/dev/activation-key-digitalenterprisedevelopment-7.1-liferaycom.xml ./deploy
+	cp ~/dev/activation-key-digitalenterprisedevelopment-7.1-liferaycom.xml ./deploy
 
-	cp /home/ryan/Documents/portal-ext.properties ./
+	cp ~/Documents/portal-ext.properties ./
 }
 
 #
@@ -222,7 +222,7 @@ function cachenpm() {
 }
 
 function hs() {
-	cd /home/ryan/Desktop/master/tomcat*/lib/ext && java -cp hsql.jar org.hsqldb.util.DatabaseManagerSwing
+	cd ~/Desktop/master/tomcat*/lib/ext && java -cp hsql.jar org.hsqldb.util.DatabaseManagerSwing
 }
 
 function lr() {
@@ -230,7 +230,7 @@ function lr() {
 	kt
 
 	#cd to tomcat bin
-	cd /home/ryan/Desktop/master/tomcat*/bin
+	cd ~/Desktop/master/tomcat*/bin
 
 	#start liferay
 	./catalina.sh jpda run
@@ -312,16 +312,16 @@ function ibm() {
 	db	
 	
 	#clear out bundle folder
-	rm -r /home/ryan/Desktop/master/*
+	rm -r ~/Desktop/master/*
 
 	#copy portal-ext.properties
 	cpext
 
 	#cd to Downloads
-	cd /home/ryan/Downloads/
+	cd ~/Downloads/
 
 	#unpack master bundle
-	tar -xf master* -C /home/ryan/Desktop/master
+	tar -xf master* -C ~/Desktop/master
 }
 
 function kt() {
@@ -329,26 +329,26 @@ function kt() {
 }
 
 function cpext() {
-	if [ ! -f /home/ryan/Desktop/master/portal-ext.properties ]; then
-    	cp /home/ryan/Documents/portal-ext.properties /home/ryan/Desktop/master
+	if [ ! -f ~/Desktop/master/portal-ext.properties ]; then
+    	cp ~/Documents/portal-ext.properties ~/Desktop/master
     fi
 }
 
 function cpr() {
-	cp /home/ryan/Documents/ROOT.xml /home/ryan/Desktop/master/tomcat-9.0.10/conf/Catalina/localhost
+	cp ~/Documents/ROOT.xml ~/Desktop/master/tomcat-9.0.10/conf/Catalina/localhost
 }
 
 function gs() {
         git status
 }
 
-MCD_RD_CLONE_PATH=/home/ryan/liferay_dev/liferay-faster-deploy
+MCD_RD_CLONE_PATH=~/liferay_dev/liferay-faster-deploy
 
 function gw() {
         ${MCD_RD_CLONE_PATH}/gw $@
 }
 
-IJ_CLONE_PATH=/home/ryan/liferay_dev/liferay-intellij
+IJ_CLONE_PATH=/Users/ryan/liferay_dev/liferay-intellij
 
 function ij() {
     ${IJ_CLONE_PATH}/intellij "$@"
@@ -386,10 +386,10 @@ bundle() {
 #    ./conf/dummy-server.crt
 #    ./conf/dummy-server.key
 #
-# Config file: /home/ryan/liferay_dev/liferay-dev-tools/docker/templates/webservers/apache-proxypass/dockerapache_proxypass
+# Config file: /Users/ryan/liferay_dev/liferay-dev-tools/docker/templates/webservers/apache-proxypass/dockerapache_proxypass
 #
 function dockerapache_proxypass() {
-        /home/ryan/liferay_dev/liferay-dev-tools/docker/templates/webservers/apache-proxypass/dockerapache_proxypass "$@"
+        /Users/ryan/liferay_dev/liferay-dev-tools/docker/templates/webservers/apache-proxypass/dockerapache_proxypass "$@"
 }
 
 function cds() {
@@ -402,3 +402,12 @@ function cleanbundle() {
 	rm -rf osgi/state
 	rm -rf work
 }
+
+alias imgdxp='export WEDEPLOY_INFRASTRUCTURE_PROVIDER=local && export WEDEPLOY_ENVIRONMENT=lfr-cloud-dev-us-east-1 && ./run-infra.sh'
+
+alias cleanimgdxp='./clean-up-infra.sh && export WEDEPLOY_ENVIRONMENT=lfr-cloud-dev-us-east-1 && ./run-infra.sh'
+
+alias createapi='telepresence --swap-deployment api --expose 3002 --logfile /dev/null --run npm run dev'
+
+alias createcon='telepresence --swap-deployment console --expose 3005 --logfile /dev/null --run npm run dev'
+
