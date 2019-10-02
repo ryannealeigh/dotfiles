@@ -6,6 +6,7 @@
 	pager = less
 [pager]
 	status = false
+	branch = false
 [filter "lfs"]
 	clean = git-lfs clean -- %f
 	smudge = git-lfs smudge -- %f
