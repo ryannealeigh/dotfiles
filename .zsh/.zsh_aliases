@@ -403,10 +403,6 @@ function cleanbundle() {
 	rm -rf work
 }
 
-alias imgdxp='export WEDEPLOY_INFRASTRUCTURE_PROVIDER=local && export WEDEPLOY_ENVIRONMENT=lfr-cloud-dev-us-east-1 && ./run-infra.sh'
-
-alias cleanimgdxp='./clean-up-infra.sh && export WEDEPLOY_ENVIRONMENT=lfr-cloud-dev-us-east-1 && ./run-infra.sh'
-
 alias createapi='telepresence --swap-deployment api --expose 3002 --logfile /dev/null --run npm run dev'
 
 alias createcon='telepresence --swap-deployment console --expose 3005 --logfile /dev/null --run npm run dev'
