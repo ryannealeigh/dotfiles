@@ -298,11 +298,6 @@ function cds() {
     fi
 }
 
-function db() {
-	yes | mysqladmin -uroot --password='***REMOVED***' drop lportal
-	mysqladmin -uroot --password='***REMOVED***' create lportal --default-character-set=utf8
-}
-
 #init master bundle
 function ibm() {
 	#kill any running tomcat processes
