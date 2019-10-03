@@ -401,4 +401,3 @@ function cleanbundle() {
 alias createapi='telepresence --swap-deployment api --expose 3002 --logfile /dev/null --run npm run dev'
 
 alias createcon='telepresence --swap-deployment console --expose 3005 --logfile /dev/null --run npm run dev'
-
