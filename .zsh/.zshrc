@@ -42,6 +42,9 @@ export CATALINA_OPTS="$CATALINA_OPTS -Dcom.sun.management.jmxremote -Dcom.sun.ma
 eval "$(jenv init -)"
 export PATH="$PATH:$HOME/Library/PackageManager/bin"
 
+# rbenv
+eval "$(rbenv init -)"
+
 # Adding autocomplete for 'we'
 [ -f ~/.lcp_autocomplete ] && source ~/.lcp_autocomplete
 
@@ -50,3 +53,5 @@ export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/bash_completion" ] && . "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
 
 export PATH="$HOME/.composer/vendor/bin:$PATH"
+export PATH="/usr/local/sbin:$PATH"
+export PATH="/usr/local/opt/ruby/bin:$PATH"
