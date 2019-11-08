@@ -1,6 +1,7 @@
 [user]
 	name = Ryan Nealeigh
 	email = ryan.nealeigh@liferay.cloud
+	signingkey = 0xA7A65F2198093FC7
 [core]
 	editor = nano
 	pager = less

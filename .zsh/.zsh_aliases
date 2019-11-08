@@ -12,6 +12,41 @@ function ij() {
     echo building ij
 }
 
-alias createapi='telepresence --swap-deployment api --expose 3002 --logfile /dev/null --run npm run dev'
+# .env loading in the shell
+dotenv () {
+  set -a
+  [ -f .env ] && . .env
+  set +a
+}
 
-alias createcon='telepresence --swap-deployment console --expose 3005 --logfile /dev/null --run npm run dev'
+function ws() {
+  webstorm .
+}
+
+function createapi() {
+  cd $HOME/dotfiles/scripts/create-api
+  ./run.sh
+}
+
+function swapapi() {
+  cd $HOME/dev/api/api
+  telepresence --swap-deployment api --logfile /dev/null --run npm run dev
+}
+
+function swapcon() {
+  cd $HOME/dev/console
+  telepresence --swap-deployment console --logfile /dev/null --run npm run dev
+}
+
+function startdev() {
+  cd $HOME/dev/development
+  ./start.sh
+}
+
+function stopdev() {
+  cd $HOME/dev/development
+  ./stop.sh
+}
+
+alias imgdxp='export WEDEPLOY_INFRASTRUCTURE_PROVIDER=local && export WEDEPLOY_ENVIRONMENT=lfr-cloud-dev-us-east-1 && ./run-infra.sh'
+alias cleanimgdxp='./clean-up-infra.sh && export WEDEPLOY_ENVIRONMENT=lfr-cloud-dev-us-east-1 && ./run-infra.sh'
