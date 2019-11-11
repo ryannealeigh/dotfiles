@@ -2,14 +2,18 @@
 alias ls='colorls -A --sd'
 
 function gs() {
-        git status
+  git status
+}
+
+function gc() {
+  git commit -S -m
 }
 
 IJ_CLONE_PATH=/Users/ryan/liferay_dev/liferay-intellij
 
 function ij() {
-    ${IJ_CLONE_PATH}/intellij "$@"
-    echo building ij
+  ${IJ_CLONE_PATH}/intellij "$@"
+  echo building ij
 }
 
 # .env loading in the shell
