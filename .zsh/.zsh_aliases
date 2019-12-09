@@ -9,6 +9,14 @@ function gc() {
   git commit -S -m
 }
 
+function kgp() {
+  kubectl get pods
+}
+
+function cpenv() {
+  cp $HOME/dev/liferay-cloud/.env ./
+}
+
 IJ_CLONE_PATH=/Users/ryan/liferay_dev/liferay-intellij
 
 function ij() {
