@@ -50,8 +50,14 @@ function swapcon() {
   telepresence --swap-deployment console --logfile /dev/null --run npm run dev
 }
 
+function swapgit() {
+  cd $HOME/dev/nodegit
+  telepresence --swap-deployment git --expose 81:80 --logfile /dev/null --run npm run start:verbose
+}
+
 function startdev() {
   cd $HOME/dev/development
+  git pull
   ./start.sh
 }
 
