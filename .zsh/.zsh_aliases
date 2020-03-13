@@ -14,7 +14,7 @@ function kgp() {
 }
 
 function cpenv() {
-  cp $HOME/dev/liferay-cloud/.env ./
+  cp $HOME/dev/odocs/.env ./
 }
 
 IJ_CLONE_PATH=/Users/ryan/liferay_dev/liferay-intellij
