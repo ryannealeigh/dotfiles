@@ -11,9 +11,6 @@ setopt nomatch
 # Set ANT_OPTS
 export ANT_OPTS=-Xmx4g
 
-# Alias hub to git
-eval "$(hub alias -s)"
-
 # gpg key
 export GPG_TTY=$(tty)
 
