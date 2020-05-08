@@ -41,28 +41,28 @@ function createapi() {
 }
 
 function swapapi() {
-  cd $HOME/dev/api/api
+  cd $HOME/dev/liferay-cloud/api/api
   telepresence --swap-deployment api --logfile /dev/null --run npm run dev
 }
 
 function swapcon() {
-  cd $HOME/dev/console
+  cd $HOME/dev/liferay-cloud/console
   telepresence --swap-deployment console --logfile /dev/null --run npm run dev
 }
 
 function swapgit() {
-  cd $HOME/dev/nodegit
+  cd $HOME/dev/liferay-cloud/nodegit
   telepresence --swap-deployment git --expose 81:80 --logfile /dev/null --run npm run start:verbose
 }
 
 function startdev() {
-  cd $HOME/dev/development
+  cd $HOME/dev/liferay-cloud/development
   git pull
   ./start.sh
 }
 
 function stopdev() {
-  cd $HOME/dev/development
+  cd $HOME/dev/liferay-cloud/development
   ./stop.sh
 }
 
